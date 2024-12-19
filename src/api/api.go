@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/bahramiofficial/watchtower/src/api/middlewares"
 	"github.com/bahramiofficial/watchtower/src/api/routers"
 	"github.com/bahramiofficial/watchtower/src/api/validations"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ func InitServer() {
 	if ok {
 		validation.RegisterValidation("mobile", validations.IranianMobileNumberValidator, true)
 	}
-	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(gin.Logger(), gin.Recovery(), middlewares.LimitByRequest())
 
 	v1 := r.Group("api/v1")
 	{
