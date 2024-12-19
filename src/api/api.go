@@ -2,11 +2,18 @@ package api
 
 import (
 	"github.com/bahramiofficial/watchtower/src/api/routers"
+	"github.com/bahramiofficial/watchtower/src/api/validations"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 func InitServer() {
 	r := gin.New()
+	validation, ok := binding.Validator.Engine().(*validator.Validate)
+	if ok {
+		validation.RegisterValidation("mobile", validations.IranianMobileNumberValidator, true)
+	}
 	r.Use(gin.Logger(), gin.Recovery())
 
 	v1 := r.Group("api/v1")
