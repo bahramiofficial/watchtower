@@ -10,6 +10,6 @@ func TestRouter(r *gin.RouterGroup) {
 
 	r.GET("/", testHandler.Test)
 	r.GET(":id", testHandler.TestById)
-	r.GET("*optinals", testHandler.TestById)
+	r.GET("/a/*optinals", testHandler.TestById)
 
 }
