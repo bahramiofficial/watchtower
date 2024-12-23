@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/bahramiofficial/watchtower/src/api/helper"
+	"github.com/bahramiofficial/watchtower/src/api/model"
+	"github.com/bahramiofficial/watchtower/src/api/service"
 	"github.com/gin-gonic/gin"
 )
 
 type TestHandler struct {
+	HuntService *service.HuntService
 }
 
 type data struct {
@@ -16,7 +19,7 @@ type data struct {
 }
 
 func NewTestHandler() *TestHandler {
-	return &TestHandler{}
+	return &TestHandler{HuntService: service.NewHuntService()}
 }
 
 func (t *TestHandler) Test(c *gin.Context) {
@@ -34,5 +37,22 @@ func (t *TestHandler) TestByDataTestValidationAndBinding(c *gin.Context) {
 	c.ShouldBind(da)
 
 	c.JSON(http.StatusOK, "ok")
+	return
+}
+
+// 1 22.30 s27
+func (t *TestHandler) CreateHunt(c *gin.Context) {
+	req := model.CreateHuntRequest{}
+	err := c.ShouldBindBodyWithJSON(&req)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, helper.GenerateBaseHttpResponseWithError(nil, false, -1, err))
+		return
+	}
+	res, err := t.HuntService.Create(c, &req)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, helper.GenerateBaseHttpResponseWithError(nil, false, -1, err))
+		return
+	}
+	c.JSON(http.StatusOK, helper.GenerateBaseHttpResponse(res, true, 1))
 	return
 }
