@@ -14,7 +14,7 @@ func main() {
 		log.Fatalf("Failed to initialize database")
 		print(err)
 	}
-	//6
+	//6  6
 	migrations.Up()
 	api.InitServer()
 }
