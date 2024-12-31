@@ -3,6 +3,7 @@
         "createdat",
         "gorm",
         "ooscopes",
-        "updatedat"
+        "updatedat",
+        "watchsyncprograms"
     ]
 }

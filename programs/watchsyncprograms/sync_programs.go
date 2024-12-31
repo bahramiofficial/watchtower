@@ -1,4 +1,4 @@
-package main
+package watchsyncprograms
 
 import (
 	"encoding/json"
@@ -14,7 +14,8 @@ import (
 	// Import the required package
 )
 
-func main() {
+// for call to api app
+func WatchSyncProgram() {
 
 	// Initialize the database connectionn
 	err := database.InitDb()
