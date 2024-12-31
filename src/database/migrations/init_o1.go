@@ -9,10 +9,15 @@ func Up() {
 	db := database.GetDb()
 
 	tables := []interface{}{}
-	hunt := model.Hunt{}
+	Program := model.Program{}
+	Subdomain := model.Subdomain{}
 
-	if !db.Migrator().HasTable(hunt) {
-		tables = append(tables, hunt)
+	if !db.Migrator().HasTable(Program) {
+		tables = append(tables, Program)
+	}
+
+	if !db.Migrator().HasTable(Subdomain) {
+		tables = append(tables, Subdomain)
 	}
 
 	db.Migrator().CreateTable(tables...)

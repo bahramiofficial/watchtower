@@ -6,14 +6,17 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime" 
-	"github.com/bahramiofficial/watchtower/src/database" 
+	"runtime"
+
 	"github.com/bahramiofficial/watchtower/src/api/model"
-) 
+	"github.com/bahramiofficial/watchtower/src/database"
+	"gorm.io/gorm"
+	// Import the required package
+)
 
 func main() {
-	 
-	// Initialize the database connection
+
+	// Initialize the database connectionn
 	err := database.InitDb()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
@@ -52,11 +55,12 @@ func main() {
 		}
 
 		// Parse the JSON content
-		var program model.ProgramModel
+		var program model.Program
 		if err := json.Unmarshal(content, &program); err != nil {
 			log.Printf("Failed to parse JSON in file %s: %v\n", file, err)
 			continue
 		}
+
 		// Insert or update the database record
 		err = insertOrUpdateProgram(db, &program)
 		if err != nil {
@@ -65,16 +69,13 @@ func main() {
 			fmt.Printf("Successfully inserted or updated record for program: %s\n", program.ProgramName)
 		}
 
-
 	}
 }
 
- 
-
 // insertOrUpdateProgram inserts a new record or updates an existing one based on the ProgramName.
-func insertOrUpdateProgram(db *gorm.DB, program *model.ProgramModel) error {
+func insertOrUpdateProgram(db *gorm.DB, program *model.Program) error {
 	// Check if the program already exists
-	var existing model.ProgramModel
+	var existing model.Program
 	err := db.Where("program_name = ?", program.ProgramName).First(&existing).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -92,5 +93,3 @@ func insertOrUpdateProgram(db *gorm.DB, program *model.ProgramModel) error {
 
 	return db.Save(&existing).Error
 }
-
-

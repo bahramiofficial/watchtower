@@ -1,6 +1,5 @@
 {
     "programName":"icolab.info",
     "scopes":["icolab.info","x.info","y.info"],
-    "ooscopes":["w.info"]
-
+    "otoscopes":["w.info"]
 }

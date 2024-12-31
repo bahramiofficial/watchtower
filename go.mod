@@ -2,13 +2,13 @@ module github.com/bahramiofficial/watchtower
 
 go 1.22
 
-
 toolchain go1.22.5
 
 require (
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.23.0
+	github.com/lib/pq v1.10.9
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
 )
