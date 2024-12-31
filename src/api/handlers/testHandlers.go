@@ -40,7 +40,8 @@ func (t *TestHandler) TestByDataTestValidationAndBinding(c *gin.Context) {
 	return
 }
 
-// 1 22.30 s27
+//1 22.30 s27
+
 func (t *TestHandler) CreateHunt(c *gin.Context) {
 	req := model.CreateHuntRequest{}
 	err := c.ShouldBindBodyWithJSON(&req)
