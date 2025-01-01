@@ -15,7 +15,7 @@ import (
 )
 
 // for call to api app
-func WatchSyncProgram() {
+func SyncProgramToDb() {
 
 	// Initialize the database connectionn
 	err := database.InitDb()
@@ -31,7 +31,14 @@ func WatchSyncProgram() {
 	if !ok {
 		log.Fatalf("Failed to get the script directory")
 	}
-	dirPath := filepath.Dir(scriptPath)
+
+	// init path json files
+	dirPath := filepath.Join(filepath.Dir(scriptPath), "json")
+
+	// Is Exist directory
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		log.Fatalf("Directory %s does not exist", dirPath)
+	}
 
 	// Scan the directory
 	files, err := filepath.Glob(filepath.Join(dirPath, "*.json"))
