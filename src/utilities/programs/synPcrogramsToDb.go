@@ -27,7 +27,7 @@ func SyncProgramToDb(dirPath string) {
 	db := database.GetDb()
 
 	// dynamic path
-	if dirPath != "" {
+	if dirPath == "" {
 		// Get the directory of the script
 		_, scriptPath, _, ok := runtime.Caller(0)
 		if !ok {
