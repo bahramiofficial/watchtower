@@ -15,7 +15,7 @@ import (
 )
 
 // for call to api app
-func SyncProgramToDb() {
+func SyncProgramToDb(dirPath string) {
 
 	// Initialize the database connectionn
 	err := database.InitDb()
@@ -26,14 +26,16 @@ func SyncProgramToDb() {
 
 	db := database.GetDb()
 
-	// Get the directory of the script
-	_, scriptPath, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatalf("Failed to get the script directory")
-	}
+	if dirPath != "" {
+		// Get the directory of the script
+		_, scriptPath, _, ok := runtime.Caller(0)
+		if !ok {
+			log.Fatalf("Failed to get the script directory")
+		}
 
-	// init path json files
-	dirPath := filepath.Join(filepath.Dir(scriptPath), "json")
+		// init path json files
+		dirPath = filepath.Join(filepath.Dir(scriptPath), "json")
+	}
 
 	// Is Exist directory
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
