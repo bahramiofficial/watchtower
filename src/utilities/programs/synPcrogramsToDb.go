@@ -10,7 +10,6 @@ import (
 
 	"github.com/bahramiofficial/watchtower/src/api/model"
 	"github.com/bahramiofficial/watchtower/src/database"
-	"gorm.io/gorm"
 	// Import the required package
 )
 
@@ -73,7 +72,7 @@ func SyncProgramToDb(dirPath string) {
 		}
 
 		// Insert or update the database record
-		err = insertOrUpdateProgram(db, &program)
+		err = model.InsertOrUpdateProgram(db, &program)
 		if err != nil {
 			log.Printf("Failed to insert or update record for file %s: %v\n", file, err)
 		} else {
@@ -81,26 +80,4 @@ func SyncProgramToDb(dirPath string) {
 		}
 
 	}
-}
-
-// insertOrUpdateProgram inserts a new record or updates an existing one based on the ProgramName.
-func insertOrUpdateProgram(db *gorm.DB, program *model.Program) error {
-	// Check if the program already exists
-	var existing model.Program
-	err := db.Where("program_name = ?", program.ProgramName).First(&existing).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// Record not found, create a new one
-			return db.Create(program).Error
-		}
-		// Other errors
-		return err
-	}
-
-	// Record found, update it
-	existing.Config = program.Config
-	existing.Scopes = program.Scopes
-	existing.Otoscopes = program.Otoscopes
-
-	return db.Save(&existing).Error
 }

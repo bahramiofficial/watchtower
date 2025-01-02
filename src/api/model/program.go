@@ -5,9 +5,12 @@ package model
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 // Import pq package for PostgreSQL support
@@ -17,6 +20,48 @@ type Program struct {
 	Config      json.RawMessage `gorm:"type:jsonb;default:null"`        // Dictionary field, nullable
 	Scopes      pq.StringArray  `gorm:"type:text[]"`                    // Correctly handle PostgreSQL text[]
 	Otoscopes   pq.StringArray  `gorm:"type:text[]"`                    // Correctly handle PostgreSQL text[]
+}
+
+// FindDomainWithProgramName queries a Program by its ProgramName
+func FindDomainWithProgramName(db *gorm.DB, programName string) (*Program, error) {
+	// Initialize a variable to hold the result
+	var program Program
+
+	// Query the database
+	err := db.Where("program_name = ?", programName).First(&program).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// If the record is not found, return nil and an error
+			return nil, fmt.Errorf("program with name '%s' not found", programName)
+		}
+		// Return any other error encountered
+		return nil, err
+	}
+
+	// If found, return the result and nil error
+	return &program, nil
+}
+
+// insertOrUpdateProgram inserts a new record or updates an existing one based on the ProgramName.
+func InsertOrUpdateProgram(db *gorm.DB, program *Program) error {
+	// Check if the program already exists
+	var existing Program
+	err := db.Where("program_name = ?", program.ProgramName).First(&existing).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Record not found, create a new one
+			return db.Create(program).Error
+		}
+		// Other errors
+		return err
+	}
+
+	// Record found, update it
+	existing.Config = program.Config
+	existing.Scopes = program.Scopes
+	existing.Otoscopes = program.Otoscopes
+
+	return db.Save(&existing).Error
 }
 
 type CreateUpdateProgramRequest struct {
@@ -42,26 +87,33 @@ type ProgramResponse struct {
 	UpdatedAt   sql.NullTime    `json:"updatedat"`
 }
 
-// /////////////////////////////////////////////////////////////
-type Subdomain struct {
-	BaseModel
-	ProgramName string   `gorm:"type:text;not null;uniqueIndex"` // Unique and indexed
-	SubDomain   string   `gorm:"type:text;not null;uniqueIndex"` // Unique and indexed
-	Providers   []string `gorm:"type:text[]"`                    // Array field, no default value
+func AddNewProgramIfNotExist(db *gorm.DB, programName string, config json.RawMessage, scopes, otoscopes []string) (*int, error) {
+	// Check if the program already exists
+	var program Program
+	err := db.Where("program_name = ?", programName).First(&program).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// If the program doesn't exist, create a new one
+			newProgram := Program{
+				ProgramName: programName,
+				Config:      config,
+				Scopes:      pq.StringArray(scopes),
+				Otoscopes:   pq.StringArray(otoscopes),
+			}
 
-}
+			// Insert the new program into the database
+			if err := db.Create(&newProgram).Error; err != nil {
+				// Return an error if insertion fails
+				return nil, fmt.Errorf("failed to insert program: %w", err)
+			}
 
-type CreateUpdateSubDomainRequest struct {
-	ProgramName string   `json:"programName" binding:"required"`
-	SubDomain   string   `json:"subDomain" binding:"required"`
-	Providers   []string `json:"providers"`
-}
+			// Return the new program ID
+			return &newProgram.Id, nil
+		}
+		// Return other errors encountered during the query
+		return nil, fmt.Errorf("failed to check if program exists: %w", err)
+	}
 
-type SubDomainResponse struct {
-	Id          int          `json:"id"`
-	ProgramName string       `json:"programName"`
-	SubDomain   string       `json:"subDomain"`
-	Providers   []string     `json:"providers"`
-	CreatedAt   time.Time    `json:"createdat"`
-	UpdatedAt   sql.NullTime `json:"updatedat"`
+	// If the program already exists, return nil and an error
+	return nil, fmt.Errorf("program with name '%s' already exists", programName)
 }
