@@ -12,7 +12,10 @@ import (
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
+	RunServer()
+}
 
+func RunServer() {
 	err := database.InitDb()
 	if err != nil {
 		log.Fatalf("Failed to initialize database")

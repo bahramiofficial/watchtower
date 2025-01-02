@@ -36,6 +36,12 @@ func Subfinder(domain string, outputFile string) {
 		if err != nil {
 			fmt.Printf("Failed to run Subfinder: %v", err)
 		}
+		// Check if there are any results
+		if results == nil || len(*results) == 0 {
+			fmt.Println("No results found.")
+			return
+		}
+
 		for _, subdomain := range *results {
 			if subdomain != "" {
 				model.UpsertSubdomain(db, program.ProgramName, subdomain, "subfinder")
