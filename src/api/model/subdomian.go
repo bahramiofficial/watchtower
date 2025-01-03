@@ -52,6 +52,7 @@ type Subdomain struct {
 	BaseModel
 	ProgramName string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"` // Named unique index
 	SubDomain   string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"` // Same unique index name
+	Scope       string      `gorm:"type:text; `
 	Providers   StringArray `gorm:"type:text[]"`
 }
 
@@ -164,6 +165,7 @@ func UpsertSubdomain(db *gorm.DB, programName string, subDomain string, provider
 			newSubdomain := Subdomain{
 				ProgramName: programName,
 				SubDomain:   subDomain,
+				Scope:       baseDomain,
 				Providers:   StringArray{provider},
 			}
 			if err := db.Create(&newSubdomain).Error; err != nil {

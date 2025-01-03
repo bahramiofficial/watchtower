@@ -29,7 +29,7 @@ func InitDb() error {
 		Port:            5432,
 		User:            "postgres",
 		Password:        "admin",
-		DbName:          "car_sale_db",
+		DbName:          "watchtower",
 		SslMode:         "disable",
 		MaxIdleConns:    15,
 		MaxOpenConns:    100,

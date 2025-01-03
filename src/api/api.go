@@ -19,8 +19,13 @@ func InitServer() {
 
 	v1 := r.Group("api/v1")
 	{
-		testGroup := v1.Group("/test")
-		routers.TestRouter(testGroup)
+		// testGroup := v1.Group("/test")
+		// routers.TestRouter(testGroup)
+		programGroup := v1.Group("/program")
+		routers.ProgramRouter(programGroup)
+
+		subdomianGroup := v1.Group("/subdomian")
+		routers.SubDomainRouter(subdomianGroup)
 	}
 
 	r.Run(":8000")
