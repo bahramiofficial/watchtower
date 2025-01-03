@@ -22,6 +22,15 @@ type Program struct {
 	Otoscopes   pq.StringArray  `gorm:"type:text[]"`                    // Correctly handle PostgreSQL text[]
 }
 
+// getAllPrograms retrieves all programs from the database
+func GetAllPrograms(db *gorm.DB) ([]Program, error) {
+	var programs []Program
+	if err := db.Find(&programs).Error; err != nil {
+		return nil, err
+	}
+	return programs, nil
+}
+
 // FindDomainWithProgramName queries a Program by its ProgramName
 func FindDomainWithProgramName(db *gorm.DB, programName string) (*Program, error) {
 	// Initialize a variable to hold the result

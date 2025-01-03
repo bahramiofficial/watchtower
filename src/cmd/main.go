@@ -6,13 +6,15 @@ import (
 	"github.com/bahramiofficial/watchtower/src/api"
 	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/database/migrations"
+	watch "github.com/bahramiofficial/watchtower/src/utilities/enum"
 )
 
 // "github.com/bahramiofficial/watchtower/src/database"
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
-	RunServer()
+	watch.EnumAll()
+	// RunServer()
 }
 
 func RunServer() {
@@ -21,6 +23,9 @@ func RunServer() {
 		log.Fatalf("Failed to initialize database")
 		print(err)
 	}
+
+
+	
 
 	//6  6
 	migrations.Up()
