@@ -24,3 +24,19 @@ func (s *SubdomainService) GetSubdomainsByScope(scope string) ([]model.Subdomain
 	}
 	return subdomains, nil
 }
+
+func (s *SubdomainService) GetSubdomainsByProgramName(programName string) ([]model.Subdomain, error) {
+	var subdomains []model.Subdomain
+	if err := s.database.Where("programname = ?", programName).Order("id DESC").Find(&subdomains).Error; err != nil {
+		return nil, err
+	}
+	return subdomains, nil
+}
+
+func (s *SubdomainService) GetAllSubdomain() ([]model.Subdomain, error) {
+	var subdomains []model.Subdomain
+	if err := s.database.Order("id DESC").Find(&subdomains).Error; err != nil {
+		return nil, err
+	}
+	return subdomains, nil
+}

@@ -8,6 +8,8 @@ import (
 func SubDomainRouter(r *gin.RouterGroup) {
 	subdomainHandler := handlers.NewSubdomainHandler()
 
-	r.GET("/:domain", subdomainHandler.GetSubdomainsByScopeHandler)
+	r.GET("/all", subdomainHandler.GetAllSubdomain)
+	r.GET("/domain/:domain", subdomainHandler.GetSubdomainsByScopeHandler)
+	r.GET("/program/:programname", subdomainHandler.GetSubdomainsByProgramName)
 
 }
