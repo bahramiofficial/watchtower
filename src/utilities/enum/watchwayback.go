@@ -42,7 +42,7 @@ func Wayback(domain string) {
 		for _, sub := range subs {
 			if sub != "" {
 				// Upsert subdomain if match found
-				err := UpsertSubdomain(program.ProgramName, sub, "wayback")
+				err := model.UpsertSubdomain(program.ProgramName, sub, "wayback")
 				if err != nil {
 					log.Printf("Failed to upsert subdomain '%s': %v", sub, err)
 				}
