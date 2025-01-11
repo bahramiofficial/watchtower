@@ -18,14 +18,13 @@ import (
 
 func Crtsh(domain string) {
 
-	err := database.InitDb()
+	// Get database connection and the deferred CloseDb function
+	db, closeDb, err := database.GetDbAfterInit()
 	if err != nil {
-		log.Fatalf("%v Failed to initialize database: %v", utilities.GetFormattedTime(), err)
-
+		log.Fatalf("Error initializing database: %v", err)
 	}
-	defer database.CloseDb()
+	defer closeDb() // Ensure that the connection will be closed when the function exits
 
-	db := database.GetDb()
 	var program *model.Program
 	var results *[]string
 

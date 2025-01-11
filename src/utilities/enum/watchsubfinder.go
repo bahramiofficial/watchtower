@@ -13,18 +13,17 @@ import (
 )
 
 func Subfinder(domain string, outputFile string) {
+	// Get database connection and the deferred CloseDb function
+	db, closeDb, err := database.GetDbAfterInit()
+	if err != nil {
+		log.Fatalf("Error initializing database: %v", err)
+	}
+	defer closeDb() // Ensure that the connection will be closed when the function exits
+
 	if outputFile == "" {
 		outputFile = "/Users/mrpit/Documents/GitHub/watchtower/src/cmd/subdomains.txt"
 	}
 
-	err := database.InitDb()
-	if err != nil {
-		log.Fatalf("%v Failed to initialize database: %v", utilities.GetFormattedTime(), err)
-
-	}
-	defer database.CloseDb()
-
-	db := database.GetDb()
 	var program *model.Program
 	var results *[]string
 

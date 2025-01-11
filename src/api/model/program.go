@@ -126,3 +126,17 @@ func AddNewProgramIfNotExist(db *gorm.DB, programName string, config json.RawMes
 	// If the program already exists, return nil and an error
 	return nil, fmt.Errorf("program with name '%s' already exists", programName)
 }
+
+// use abuse db
+// GetProgramByScope retrieves the first program that matches the given scope.
+func GetProgramByScope(db *gorm.DB, domain string) (*Program, error) {
+	var program Program
+	err := db.Where("? = ANY(scopes)", domain).First(&program).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("no program found for scope '%s'", domain)
+		}
+		return nil, err
+	}
+	return &program, nil
+}

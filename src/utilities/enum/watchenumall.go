@@ -31,6 +31,8 @@ func EnumAll() {
 			fmt.Printf("run Subfinder and crtsh on : %s\n", scope)
 			Subfinder(scope, "")
 			Crtsh(scope)
+			RunAbuseIPDB(scope)
+			Wayback(scope)
 		}
 	}
 

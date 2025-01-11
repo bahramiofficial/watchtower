@@ -66,3 +66,20 @@ func CloseDb() {
 	con, _ := dbClient.DB()
 	con.Close()
 }
+
+// GetDbAfterInit ensures the database is initialized before being used.
+// The connection will be closed after the function finishes executing.
+func GetDbAfterInit() (*gorm.DB, func(), error) {
+	// Initialize database connection if it's not already initialized
+	if dbClient == nil {
+		err := InitDb()
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to initialize database: %w", err)
+		}
+	}
+
+	// Return the database connection and a function to close the connection
+	return dbClient, func() {
+		CloseDb() // This will be deferred and called after the job is completed
+	}, nil
+}

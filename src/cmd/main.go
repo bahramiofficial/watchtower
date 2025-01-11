@@ -6,7 +6,6 @@ import (
 	"github.com/bahramiofficial/watchtower/src/api"
 	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/database/migrations"
-	watch "github.com/bahramiofficial/watchtower/src/utilities/enum"
 	watchsyncprograms "github.com/bahramiofficial/watchtower/src/utilities/programs"
 )
 
@@ -27,7 +26,7 @@ func RunServer() {
 	}
 
 	//6  6
-	watch.SyncProgramToDb("")
+	// watch.SyncProgramToDb("")
 	migrations.Up()
 	api.InitServer()
 }
