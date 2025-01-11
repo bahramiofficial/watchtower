@@ -4,7 +4,6 @@ package model
 
 import (
 	"database/sql"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"strings"
@@ -13,39 +12,6 @@ import (
 	"github.com/bahramiofficial/watchtower/src/utilities"
 	"gorm.io/gorm"
 )
-
-// StringArray custom type for PostgreSQL text[]
-type StringArray []string
-
-// Scan implements the sql.Scanner interface for StringArray
-func (sa *StringArray) Scan(value interface{}) error {
-	if value == nil {
-		*sa = []string{}
-		return nil
-	}
-	// Parse the PostgreSQL array literal
-	str, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("failed to parse StringArray: %v", value)
-	}
-	// Convert the PostgreSQL array literal into a slice
-	str = strings.Trim(str, "{}")
-	if str == "" {
-		*sa = []string{}
-	} else {
-		*sa = strings.Split(str, ",")
-	}
-	return nil
-}
-
-// Value implements the driver.Valuer interface for StringArray
-func (sa StringArray) Value() (driver.Value, error) {
-	// Convert the slice into a PostgreSQL-compatible array literal
-	for i, v := range sa {
-		sa[i] = fmt.Sprintf("\"%s\"", strings.ReplaceAll(v, "\"", "\\\""))
-	}
-	return "{" + strings.Join(sa, ",") + "}", nil
-}
 
 // /////////////////////////////////////////////////////////////
 type Subdomain struct {
@@ -82,6 +48,27 @@ type SubDomainResponse struct {
 	UpdatedAt   sql.NullTime `json:"updatedat"`
 }
 
+// GetAllSubdomainWithScope fetches all subdomains associated with a given scope
+func GetAllSubdomainWithScope(db *gorm.DB, scope string) ([]string, error) {
+	// Initialize a variable to hold the results
+	var subdomains []Subdomain
+
+	// Fetch all subdomains where the scope matches the provided scope
+	err := db.Where("scope = ?", scope).Find(&subdomains).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch subdomains for scope '%s': %w", scope, err)
+	}
+
+	// Extract the subdomains from the result
+	var subdomainNames []string
+	for _, subdomain := range subdomains {
+		subdomainNames = append(subdomainNames, subdomain.SubDomain)
+	}
+
+	// Return the list of subdomains
+	return subdomainNames, nil
+}
+
 func FindSubdomainByProgramAndSubdomain(db *gorm.DB, programName, subDomain string) (*Subdomain, error) {
 
 	// Initialize a variable to hold the result
@@ -104,6 +91,14 @@ func FindSubdomainByProgramAndSubdomain(db *gorm.DB, programName, subDomain stri
 
 // Always a single string for the provider
 func UpsertSubdomain(db *gorm.DB, programName string, subDomain string, provider string) error {
+
+	// Ensure subdomain is valid (no wildcard and no top-level domain)
+	if strings.Contains(subDomain, "*") {
+		return fmt.Errorf("subdomain '%s' contains a wildcard (*), which is not allowed", subDomain)
+	}
+	if strings.Count(subDomain, ".") <= 1 {
+		return fmt.Errorf("subdomain '%s' is invalid. It must contain at least one subdomain (e.g., sub.x.com)", subDomain)
+	}
 
 	// Fetch the program using the program name
 	var program Program

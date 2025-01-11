@@ -6,13 +6,16 @@ import (
 	"github.com/bahramiofficial/watchtower/src/api"
 	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/database/migrations"
+	watch "github.com/bahramiofficial/watchtower/src/utilities/enum"
+	watchsyncprograms "github.com/bahramiofficial/watchtower/src/utilities/programs"
 )
 
 // "github.com/bahramiofficial/watchtower/src/database"
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
-	//watch.EnumAll()
+	// ns.Ns()
+	watchsyncprograms.SyncProgramToDb("")
 	RunServer()
 }
 
@@ -24,6 +27,7 @@ func RunServer() {
 	}
 
 	//6  6
+	watch.SyncProgramToDb("")
 	migrations.Up()
 	api.InitServer()
 }

@@ -11,6 +11,8 @@ func Up() {
 	tables := []interface{}{}
 	Program := model.Program{}
 	Subdomain := model.Subdomain{}
+	LiveSubdomains := model.LiveSubdomains{}
+	Http := model.Http{}
 
 	if !db.Migrator().HasTable(Program) {
 		tables = append(tables, Program)
@@ -18,6 +20,12 @@ func Up() {
 
 	if !db.Migrator().HasTable(Subdomain) {
 		tables = append(tables, Subdomain)
+	}
+	if !db.Migrator().HasTable(LiveSubdomains) {
+		tables = append(tables, LiveSubdomains)
+	}
+	if !db.Migrator().HasTable(Http) {
+		tables = append(tables, Http)
 	}
 
 	db.Migrator().CreateTable(tables...)
