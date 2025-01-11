@@ -9,3 +9,7 @@ run database
 add to   ~/.zshrc
 alias watch_sync_programs="go run /Users/mrpit/Documents/GitHub/watchtower/src/$
 
+
+
+install gau  unfurl  wayback subfinder  
+
