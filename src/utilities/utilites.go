@@ -1,9 +1,23 @@
 package utilities
 
 import (
+	"log"
+	"os"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
+
+func GetRootPath() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	ROOT_DIR := os.Getenv("ROOT_DIR")
+	return ROOT_DIR
+}
 
 // ExtractBaseDomain extracts the base domain from a full subdomain.
 // It works by splitting the domain and considering the last two segments

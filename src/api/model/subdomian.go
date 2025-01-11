@@ -92,10 +92,13 @@ func FindSubdomainByProgramAndSubdomain(db *gorm.DB, programName, subDomain stri
 // Always a single string for the provider
 func UpsertSubdomain(db *gorm.DB, programName string, subDomain string, provider string) error {
 
+	// Check if the subdomain matches the domain and is not a wildcard
 	// Ensure subdomain is valid (no wildcard and no top-level domain)
 	if strings.Contains(subDomain, "*") {
 		return fmt.Errorf("subdomain '%s' contains a wildcard (*), which is not allowed", subDomain)
 	}
+
+	// Check if the subdomain matches the domain and is not a wildcard
 	if strings.Count(subDomain, ".") <= 1 {
 		return fmt.Errorf("subdomain '%s' is invalid. It must contain at least one subdomain (e.g., sub.x.com)", subDomain)
 	}

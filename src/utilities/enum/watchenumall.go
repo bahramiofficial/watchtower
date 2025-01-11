@@ -33,6 +33,7 @@ func EnumAll() {
 			Crtsh(scope)
 			RunAbuseIPDB(scope)
 			Wayback(scope)
+			Chaos(scope)
 		}
 	}
 
