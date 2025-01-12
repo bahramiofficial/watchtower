@@ -48,7 +48,7 @@ func Chaos(domain string) {
 // Chaos function reads the domain-specific file in the CHAOS_FOLDER
 func Runchaos(domain string) []string {
 	// Construct the path to the file in the CHAOS_FOLDER
-	filePath := filepath.Join(utilities.GetRootPath(), "/data/chaos/", fmt.Sprintf("%s.txt", domain))
+	filePath := filepath.Join(utilities.GetRootDirPath(), "/data/chaos/", fmt.Sprintf("%s.txt", domain))
 
 	// Check if the file exists
 	if _, err := os.Stat(filePath); err == nil {
@@ -109,7 +109,7 @@ func downloadAndUnzip() {
 		fmt.Printf("Error reading temp directory: %v\n", err)
 		return
 	}
-	CHAOS_FOLDER := filepath.Join(utilities.GetRootPath(), "/data/chaos")
+	CHAOS_FOLDER := filepath.Join(utilities.GetRootDirPath(), "/data/chaos")
 
 	for _, file := range files {
 		if !file.IsDir() {

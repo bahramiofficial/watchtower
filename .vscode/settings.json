@@ -12,6 +12,8 @@
         "dynamicbrute",
         "godotenv",
         "gorm",
+        "httpsubdomain",
+        "httpsubdomains",
         "massdns",
         "mrpit",
         "mysecretkey",
@@ -27,6 +29,7 @@
         "watchsyncprograms",
         "Wayback",
         "waybackurls",
+        "WEBHOOKDISCORD",
         "wordlist"
     ]
 }

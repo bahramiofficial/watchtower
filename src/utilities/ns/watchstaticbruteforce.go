@@ -1,4 +1,4 @@
-package watch
+package ns
 
 import (
 	"fmt"
@@ -75,7 +75,7 @@ func RunStaticBrute(domain string) (*[]string, error) {
 
 	for _, cmd := range commands {
 		fmt.Printf("Executing command: %s\n", cmd)
-		if _, err := runCommandInZsh(cmd); err != nil {
+		if _, err := utilities.RunCommandInZsh(cmd); err != nil {
 			return nil, fmt.Errorf("failed to execute command: %s, error: %w", cmd, err)
 		}
 	}
@@ -86,7 +86,7 @@ func RunStaticBrute(domain string) (*[]string, error) {
 		domainStaticPath, domain,
 	)
 	fmt.Printf("Executing command: %s\n", shufflednsCommand)
-	output, err := runCommandInZsh(shufflednsCommand)
+	output, err := utilities.RunCommandInZsh(shufflednsCommand)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute shuffledns command: %w", err)
 	}

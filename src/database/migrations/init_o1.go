@@ -11,7 +11,7 @@ func Up() {
 	tables := []interface{}{}
 	Program := model.Program{}
 	Subdomain := model.Subdomain{}
-	LiveSubdomains := model.LiveSubdomains{}
+	LiveSubdomains := model.LiveSubdomain{}
 	Http := model.Http{}
 
 	if !db.Migrator().HasTable(Program) {

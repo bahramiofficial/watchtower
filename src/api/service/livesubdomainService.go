@@ -17,8 +17,8 @@ func NewLiveSubdomainService() *LiveSubdomainService {
 }
 
 // GetLiveSubdomainsByScope retrieves all live subdomains where the scope matches the input
-func (s *LiveSubdomainService) GetLiveSubdomainsByScope(scope string) ([]model.LiveSubdomains, error) {
-	var liveSubdomains []model.LiveSubdomains
+func (s *LiveSubdomainService) GetLiveSubdomainsByScope(scope string) ([]model.LiveSubdomain, error) {
+	var liveSubdomains []model.LiveSubdomain
 	if err := s.database.Where("scope = ?", scope).Order("id DESC").Find(&liveSubdomains).Error; err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (s *LiveSubdomainService) GetLiveSubdomainsByScope(scope string) ([]model.L
 }
 
 // GetLiveSubdomainsByProgramName retrieves all live subdomains where the program name matches the input
-func (s *LiveSubdomainService) GetLiveSubdomainsByProgramName(programName string) ([]model.LiveSubdomains, error) {
-	var liveSubdomains []model.LiveSubdomains
+func (s *LiveSubdomainService) GetLiveSubdomainsByProgramName(programName string) ([]model.LiveSubdomain, error) {
+	var liveSubdomains []model.LiveSubdomain
 	if err := s.database.Where("program_name = ?", programName).Order("id DESC").Find(&liveSubdomains).Error; err != nil {
 		return nil, err
 	}

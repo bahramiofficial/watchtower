@@ -1,10 +1,9 @@
-package watch
+package ns
 
 import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/bahramiofficial/watchtower/src/api/model"
@@ -73,7 +72,7 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 	}
 	for _, cmd := range commands {
 		fmt.Printf("Executing command: %s\n", cmd)
-		_, err := runCommandInZsh(cmd)
+		_, err := utilities.RunCommandInZsh(cmd)
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +109,7 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 
 	// Step 3: Run dnsgen command
 	command := fmt.Sprintf("cat %s | dnsgen -w %s - | tee %s", dnsBrute, mergedPath, domainDnsGen)
-	dnsGenResult, err := runCommandInZsh(command)
+	dnsGenResult, err := utilities.RunCommandInZsh(command)
 	if err != nil {
 		fmt.Printf("Error running dnsgen command")
 		return nil, err
@@ -143,7 +142,7 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 		}
 
 		// Re-run the dnsgen command
-		_, err = runCommandInZsh(command)
+		_, err = utilities.RunCommandInZsh(command)
 		if err != nil {
 
 			fmt.Printf("Error running dnsgen command")
@@ -156,7 +155,7 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 	shufflednsCommand := fmt.Sprintf(
 		"shuffledns -list %s -d %s -r ~/.resolvers -m $(which massdns) -mode resolve -t 100 -silent", domainDnsGen, domain)
 	fmt.Printf("Executing command: %s\n", shufflednsCommand)
-	output, err := runCommandInZsh(shufflednsCommand)
+	output, err := utilities.RunCommandInZsh(shufflednsCommand)
 	if err != nil {
 		return nil, err
 	}
@@ -164,10 +163,4 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 	results := strings.Split(string(output), "\n")
 	return &results, nil
 
-}
-
-func runCommandInZsh(command string) (string, error) {
-	cmd := exec.Command("zsh", "-c", command)
-	output, err := cmd.CombinedOutput()
-	return string(output), err
 }

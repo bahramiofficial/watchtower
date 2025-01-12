@@ -8,24 +8,22 @@ import (
 
 	"github.com/bahramiofficial/watchtower/src/api/model"
 	"github.com/bahramiofficial/watchtower/src/database"
-	"github.com/bahramiofficial/watchtower/src/utilities"
 )
 
-func Ns() {
-	err := database.InitDb()
+
+func Ns(domain string) {
+	// Get database connection and the deferred CloseDb function
+	db, closeDb, err := database.GetDbAfterInit()
 	if err != nil {
-		log.Fatalf("%v Failed to initialize database: %v", utilities.GetFormattedTime(), err)
-
+		log.Fatalf("Error initializing database: %v", err)
 	}
-	defer database.CloseDb()
+	defer closeDb() // Ensure that the connection will be closed when the function exits
 
-	db := database.GetDb()
-	domian := "x.com"
-	subdomain, err := model.GetAllSubdomainWithScopeName(db, domian)
+	subdomain, err := model.GetAllSubdomainWithScopeName(db, domain)
 	if err != nil {
 		fmt.Printf("can't get subdomain")
 	}
-	out, err := RunNsCommand(subdomain, domian)
+	out, err := RunNsCommand(subdomain, domain)
 	if err != nil {
 		fmt.Printf("can't run ns command")
 	}

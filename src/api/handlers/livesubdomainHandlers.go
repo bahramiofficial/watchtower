@@ -57,7 +57,7 @@ func (h *LiveSubdomainHandler) GetLiveSubdomainsByProgramNameHandler(c *gin.Cont
 }
 
 // Helper function to extract LiveSubdomain names
-func extractLiveSubdomainNames(liveSubdomains []model.LiveSubdomains) []string {
+func extractLiveSubdomainNames(liveSubdomains []model.LiveSubdomain) []string {
 	names := make([]string, len(liveSubdomains))
 	for i, liveSubdomain := range liveSubdomains {
 		names[i] = liveSubdomain.SubDomain
