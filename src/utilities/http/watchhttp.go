@@ -7,20 +7,14 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-)
 
-const (
-	userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0"
-)
-
-// Colors for terminal output
-var (
-	Gray  = "\033[90m"
-	Reset = "\033[0m"
+	"github.com/bahramiofficial/watchtower/src/utilities"
 )
 
 // Httpx runs the httpx command on a list of subdomains and returns parsed JSON responses
 func Httpx(subdomains []string, domain string) ([]map[string]interface{}, error) {
+	userAgent := utilities.GetUserAgent()
+
 	// Create a temporary file to store subdomains
 	tempFile, err := os.CreateTemp("", "subdomains_*.txt")
 	if err != nil {
@@ -44,7 +38,7 @@ func Httpx(subdomains []string, domain string) ([]map[string]interface{}, error)
 		tempFile.Name(), userAgent, domain,
 	)
 
-	fmt.Printf("%sExecuting command: %s%s\n", Gray, command, Reset)
+	fmt.Printf("Executing command: %s\n", command)
 
 	// Run the command
 	cmd := exec.Command("zsh", "-c", command)
