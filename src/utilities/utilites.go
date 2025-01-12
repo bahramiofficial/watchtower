@@ -63,7 +63,7 @@ func SendDiscordMessage(message string) {
 	// Convert the payload to JSON
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		fmt.Printf("failed to marshal JSON: %w", err)
+		fmt.Printf("failed to marshal JSON: %v", err)
 	}
 
 	// Replace with your function to get configuration values
@@ -74,7 +74,7 @@ func SendDiscordMessage(message string) {
 		// Send the POST request
 		resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(jsonData))
 		if err != nil {
-			fmt.Printf("failed to send POST request: %w", err)
+			fmt.Printf("failed to send POST request: %v", err)
 		}
 		defer resp.Body.Close()
 
