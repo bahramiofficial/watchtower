@@ -11,5 +11,5 @@ alias watch_sync_programs="go run /Users/mrpit/Documents/GitHub/watchtower/src/$
 
 
 
-install gau  unfurl  wayback subfinder  
+install gau  unfurl  wayback subfinder  shuffledns massdns
 

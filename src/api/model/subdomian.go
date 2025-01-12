@@ -49,7 +49,21 @@ type SubDomainResponse struct {
 }
 
 // GetAllSubdomainWithScope fetches all subdomains associated with a given scope
-func GetAllSubdomainWithScope(db *gorm.DB, scope string) ([]string, error) {
+func GetAllSubdomainWithScope(db *gorm.DB, scope string) ([]Subdomain, error) {
+	// Initialize a variable to hold the results
+	var subdomains []Subdomain
+
+	// Fetch all subdomains where the scope matches the provided scope
+	err := db.Where("scope = ?", scope).Find(&subdomains).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch subdomains for scope '%s': %w", scope, err)
+	}
+
+	// Return  subdomains
+	return subdomains, nil
+}
+
+func GetAllSubdomainWithScopeName(db *gorm.DB, scope string) ([]string, error) {
 	// Initialize a variable to hold the results
 	var subdomains []Subdomain
 

@@ -34,6 +34,8 @@ func EnumAll() {
 			RunAbuseIPDB(scope)
 			Wayback(scope)
 			Chaos(scope)
+			DynamicBrute(scope)
+			StaticBrute(scope)
 		}
 	}
 

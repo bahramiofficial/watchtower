@@ -1,26 +1,32 @@
 {
     "cSpell.words": [
         "abuseipdb",
+        "altdns",
         "bahramiofficial",
         "certwatch",
         "createdat",
         "Crtsh",
         "dbname",
+        "dnsgen",
         "dnsx",
+        "dynamicbrute",
         "godotenv",
         "gorm",
+        "massdns",
         "mrpit",
         "mysecretkey",
         "ooscopes",
         "plainto",
         "programname",
         "Runchaos",
+        "shuffledns",
         "sslmode",
         "Subfinder",
         "tsquery",
         "updatedat",
         "watchsyncprograms",
         "Wayback",
-        "waybackurls"
+        "waybackurls",
+        "wordlist"
     ]
 }

@@ -21,7 +21,7 @@ func Ns() {
 
 	db := database.GetDb()
 	domian := "x.com"
-	subdomain, err := model.GetAllSubdomainWithScope(db, domian)
+	subdomain, err := model.GetAllSubdomainWithScopeName(db, domian)
 	if err != nil {
 		fmt.Printf("can't get subdomain")
 	}
