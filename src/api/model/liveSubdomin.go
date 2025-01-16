@@ -35,6 +35,21 @@ func GetAllLiveSubdomainWithScope(db *gorm.DB, scope string) ([]LiveSubdomain, e
 	return liveSubdomains, nil
 }
 
+// GetAllLiveSubdomainWithScope fetches all subdomains associated with a given scope
+func GetAllLiveSubdomainWithScopeAndDomain(db *gorm.DB, scope string, domain string) ([]LiveSubdomain, error) {
+	// Initialize a variable to hold the results
+	var liveSubdomains []LiveSubdomain
+
+	// Fetch all subdomains where the scope matches the provided scope
+	err := db.Where("scope = ? AND ", scope).Find(&liveSubdomains).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch subdomains for scope '%s': %w", scope, err)
+	}
+
+	// Return the list of subdomains
+	return liveSubdomains, nil
+}
+
 // UpsertLiveSubdomain creates or updates a live subdomain entry in the database
 func UpsertLiveSubdomain(db *gorm.DB, programName string, subDomain string, scope string, ips []string, tag string) error {
 

@@ -33,3 +33,11 @@ func (s *LiveSubdomainService) GetLiveSubdomainsByProgramName(programName string
 	}
 	return liveSubdomains, nil
 }
+
+func (s *LiveSubdomainService) GetSingleLiveSubdomainBySubdomain(subdomain string) (model.LiveSubdomain, error) {
+	var liveSubdomain model.LiveSubdomain
+	if err := s.database.Where("subdomain = ?", subdomain).First(&liveSubdomain).Error; err != nil {
+		return model.LiveSubdomain{}, err
+	}
+	return liveSubdomain, nil
+}

@@ -11,8 +11,11 @@ import (
 	"github.com/bahramiofficial/watchtower/src/utilities"
 )
 
+// 28 5
+// if use RunHttpx    add if info cdn of public or private for performance
+
 // Httpx runs the httpx command on a list of subdomains and returns parsed JSON responses
-func Httpx(subdomains []string, domain string) ([]map[string]interface{}, error) {
+func RunHttpx(subdomains []string, domain string) ([]map[string]interface{}, error) {
 	userAgent := utilities.GetUserAgent()
 
 	// Create a temporary file to store subdomains

@@ -40,3 +40,11 @@ func (s *SubdomainService) GetAllSubdomain() ([]model.Subdomain, error) {
 	}
 	return subdomains, nil
 }
+
+func (s *SubdomainService) GetSingleSubdomainBySubDomain(subdomain string) (model.Subdomain, error) {
+	var Subdomain model.Subdomain
+	if err := s.database.Where("subdomain = ?", subdomain).First(&Subdomain).Error; err != nil {
+		return model.Subdomain{}, err
+	}
+	return Subdomain, nil
+}
