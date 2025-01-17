@@ -50,3 +50,40 @@ func GetAllHttp(db *gorm.DB) ([]Http, error) {
 	// Return  Https
 	return https, nil
 }
+
+// UpsertHttp performs an upsert (insert or update) operation on the Http model
+func UpsertHttp(db *gorm.DB, http Http) {
+	var existing Http
+
+	// Check if the record already exists
+	err := db.Where("program_name = ? AND sub_domain = ?", http.ProgramName, http.SubDomain).First(&existing).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// New record, create it
+			if err := db.Create(&http).Error; err != nil {
+				fmt.Printf("Failed to create new Http record: %v", err)
+			} else {
+				fmt.Printf("New HTTP record created for %s", http.SubDomain)
+
+			}
+		} else {
+			fmt.Printf("Error finding existing Http record: %v", err)
+		}
+		return
+	}
+
+	// Compare and update fields
+	if http.StatusCode != existing.StatusCode {
+		fmt.Printf("Change status code for  %s", http.SubDomain)
+	}
+	if http.Title != existing.Title {
+		fmt.Printf("Change title for  %s", http.SubDomain)
+	}
+
+	// Perform the update
+	if err := db.Model(&existing).Updates(http).Error; err != nil {
+		fmt.Printf("Failed to update Http record: %v", err)
+		return
+	}
+
+}

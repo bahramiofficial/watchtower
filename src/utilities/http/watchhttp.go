@@ -1,20 +1,72 @@
-package utilities
+package http
 
 import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/bahramiofficial/watchtower/src/api/model"
+	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/utilities"
+	"gorm.io/gorm"
 )
+
+func convertToMapField(input interface{}) model.MapField {
+	headers := make(model.MapField)
+	for key, value := range input.(map[string]interface{}) {
+		headers[key] = fmt.Sprintf("%v", value) // Convert value to string if necessary
+	}
+	return headers
+}
+
+// processResults converts input and calls upsertHTTP
+func processResults(db *gorm.DB, results []map[string]interface{}, domain string) {
+	for _, obj := range results {
+		http := model.Http{
+			SubDomain:  obj["input"].(string),
+			Scope:      domain,
+			IPs:        obj["a"].([]string),
+			Tech:       obj["tech"].([]string),
+			Title:      obj["title"].(string),
+			StatusCode: obj["status_code"].(string),
+			Headers:    convertToMapField(obj["header"]),
+			URL:        obj["url"].(string),
+			FinalURL:   obj["final_url"].(string),
+			Favicon:    obj["favicon"].(string),
+		}
+		model.UpsertHttp(db, http)
+	}
+}
 
 // 28 5
 // if use RunHttpx    add if info cdn of public or private for performance
+func Httpx(domain string) {
+	// Get database connection and the deferred CloseDb function
+	db, closeDb, err := database.GetDbAfterInit()
+	if err != nil {
+		log.Fatalf("Error initializing database: %v", err)
+	}
+	defer closeDb() // Ensure that the connection will be closed when the function exits
 
-// Httpx runs the httpx command on a list of subdomains and returns parsed JSON responses
+	// Get program by scope
+	liveSubdomain, err := model.GetAllLiveSubdomainWithScopeName(db, domain)
+
+	if err != nil {
+		log.Printf("Error: %v", err)
+		return
+	}
+	res, err := RunHttpx(liveSubdomain, domain)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+	}
+	processResults(db, res, domain)
+
+} // Httpx runs the httpx command on a list of subdomains and returns parsed JSON responses
+
 func RunHttpx(subdomains []string, domain string) ([]map[string]interface{}, error) {
 	userAgent := utilities.GetUserAgent()
 

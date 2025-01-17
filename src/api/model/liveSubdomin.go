@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// todo changed cdn to info and value is cdn or private or none
 // LiveSubdomains represents the live subdomains model
 type LiveSubdomain struct {
 	BaseModel
@@ -33,6 +34,26 @@ func GetAllLiveSubdomainWithScope(db *gorm.DB, scope string) ([]LiveSubdomain, e
 
 	// Return the list of subdomains
 	return liveSubdomains, nil
+}
+
+func GetAllLiveSubdomainWithScopeName(db *gorm.DB, scope string) ([]string, error) {
+	// Initialize a variable to hold the results
+	var liveSubdomain []LiveSubdomain
+
+	// Fetch all subdomains where the scope matches the provided scope
+	err := db.Where("scope = ?", scope).Find(&liveSubdomain).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch subdomains for scope '%s': %w", scope, err)
+	}
+
+	// Extract the subdomains from the result
+	var livesubdomainNames []string
+	for _, subdomain := range liveSubdomain {
+		livesubdomainNames = append(livesubdomainNames, subdomain.SubDomain)
+	}
+
+	// Return the list of subdomains
+	return livesubdomainNames, nil
 }
 
 // GetAllLiveSubdomainWithScope fetches all subdomains associated with a given scope
