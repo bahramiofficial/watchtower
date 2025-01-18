@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"time"
 
@@ -92,6 +93,7 @@ func GetUserAgent() string {
 
 // env
 func GetValueEnv(key string) string {
+	return "https:google.com"
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file")
@@ -105,4 +107,27 @@ func GetWebHookDiscordUrl() string {
 }
 func GetRootDirPath() string {
 	return GetValueEnv("ROOT_PATH_DIR")
+}
+
+// AreSlicesEqual compares two slices of strings for equality, considering the order of elements.
+func AreSlicesEqual(slice1, slice2 []string) bool {
+	if len(slice1) != len(slice2) {
+		return false
+	}
+
+	// Create copies to avoid mutating original slices
+	copy1 := append([]string{}, slice1...)
+	copy2 := append([]string{}, slice2...)
+
+	// Sort both slices
+	sort.Strings(copy1)
+	sort.Strings(copy2)
+
+	// Compare sorted slices
+	for i := range copy1 {
+		if copy1[i] != copy2[i] {
+			return false
+		}
+	}
+	return true
 }

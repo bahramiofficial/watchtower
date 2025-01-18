@@ -118,7 +118,7 @@ func (h *LiveSubdomainHandler) GetLiveSubdomainsByProgramNameHandler(c *gin.Cont
 func extractLiveSubdomainNames(liveSubdomains []model.LiveSubdomain) []string {
 	names := make([]string, len(liveSubdomains))
 	for i, liveSubdomain := range liveSubdomains {
-		names[i] = liveSubdomain.SubDomain
+		names[i] = liveSubdomain.Subdomain
 	}
 	return names
 }

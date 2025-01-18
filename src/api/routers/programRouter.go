@@ -8,6 +8,7 @@ import (
 func ProgramRouter(r *gin.RouterGroup) {
 	programHandler := handlers.NewProgramHandler()
 
-	r.GET("/", programHandler.GetAllProgramsHandler)
+	r.GET("/all", programHandler.GetAllProgramsHandler)
+	r.GET("/:programname", programHandler.GetSingleProgramsHandler)
 
 }

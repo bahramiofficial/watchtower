@@ -20,6 +20,7 @@ type Program struct {
 	Config      json.RawMessage `gorm:"type:jsonb;default:null"`        // Dictionary field, nullable
 	Scopes      pq.StringArray  `gorm:"type:text[]"`                    // Correctly handle PostgreSQL text[]
 	Otoscopes   pq.StringArray  `gorm:"type:text[]"`                    // Correctly handle PostgreSQL text[]
+
 }
 
 // getAllPrograms retrieves all programs from the database
@@ -29,6 +30,22 @@ func GetAllPrograms(db *gorm.DB) ([]Program, error) {
 		return nil, err
 	}
 	return programs, nil
+}
+
+// GetProgramByProgramName fetches a Program by its ProgramName
+func GetProgramByProgramName(db *gorm.DB, programName string) (Program, error) {
+	var program Program
+
+	// Fetch the program where ProgramName matches the provided value
+	err := db.Where("program_name = ?", programName).First(&program).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return program, fmt.Errorf("no program found with program_name: %s", programName)
+		}
+		return program, fmt.Errorf("failed to fetch program by program_name: %w", err)
+	}
+
+	return program, nil
 }
 
 // FindDomainWithProgramName queries a Program by its ProgramName
@@ -131,7 +148,7 @@ func AddNewProgramIfNotExist(db *gorm.DB, programName string, config json.RawMes
 // GetProgramByScope retrieves the first program that matches the given scope.
 func GetProgramByScope(db *gorm.DB, domain string) (*Program, error) {
 	var program Program
-	err := db.Where("? = ANY(scopes)", domain).First(&program).Error
+	err := db.Where("ARRAY_TO_STRING(scopes, ',') ILIKE ?", "%"+domain+"%").First(&program).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("no program found for scope '%s'", domain)

@@ -3,7 +3,9 @@ package watch
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/bahramiofficial/watchtower/src/api/model"
@@ -21,7 +23,16 @@ func Subfinder(domain string, outputFile string) {
 	defer closeDb() // Ensure that the connection will be closed when the function exits
 
 	if outputFile == "" {
-		outputFile = "/Users/mrpit/Documents/GitHub/watchtower/src/cmd/subdomains.txt"
+		outputFile = filepath.Join(utilities.GetRootDirPath(), "data", "subfinder", "subfindersubs.txt")
+	}
+
+	// Check if file exists
+	if _, err := os.Stat(outputFile); err == nil {
+		// File exists, remove it
+		err := os.Remove(outputFile)
+		if err != nil {
+			fmt.Print("not removing", outputFile)
+		}
 	}
 
 	var program *model.Program

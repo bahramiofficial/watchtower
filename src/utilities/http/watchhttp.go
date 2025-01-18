@@ -1,4 +1,4 @@
-package http
+package watchhttp
 
 import (
 	"bufio"
@@ -23,21 +23,62 @@ func convertToMapField(input interface{}) model.MapField {
 	return headers
 }
 
-// processResults converts input and calls upsertHTTP
+func safeString(input interface{}) string {
+	if input == nil {
+		return ""
+	}
+
+	switch v := input.(type) {
+	case string:
+		return v
+	case float64: // Handle float64 as a common numeric type
+		return fmt.Sprintf("%.0f", v) // Convert to a whole number string without decimal
+	default:
+		return fmt.Sprintf("%v", input) // Use default string conversion for other types
+	}
+}
+
+func safeStringSlice(input interface{}) []string {
+	if input == nil {
+		return nil
+	}
+	interfaceSlice, ok := input.([]interface{})
+	if !ok {
+		return nil
+	}
+	stringSlice := make([]string, len(interfaceSlice))
+	for i, v := range interfaceSlice {
+		if str, ok := v.(string); ok {
+			stringSlice[i] = str
+		}
+	}
+	return stringSlice
+}
+
 func processResults(db *gorm.DB, results []map[string]interface{}, domain string) {
 	for _, obj := range results {
-		http := model.Http{
-			SubDomain:  obj["input"].(string),
-			Scope:      domain,
-			IPs:        obj["a"].([]string),
-			Tech:       obj["tech"].([]string),
-			Title:      obj["title"].(string),
-			StatusCode: obj["status_code"].(string),
-			Headers:    convertToMapField(obj["header"]),
-			URL:        obj["url"].(string),
-			FinalURL:   obj["final_url"].(string),
-			Favicon:    obj["favicon"].(string),
+
+		program, err := model.GetProgramByScope(db, safeString(obj["input"]))
+		if err != nil {
+			fmt.Printf("faild to get program for scope %s: %v", safeString(obj["input"]), err)
+			continue
 		}
+
+		http := model.Http{
+			ProgramName: program.ProgramName,
+			SubDomain:   safeString(obj["input"]),
+			Scope:       domain,
+			IPs:         safeStringSlice(obj["a"]),
+			Tech:        safeStringSlice(obj["tech"]),
+			Title:       safeString(obj["title"]),
+			StatusCode:  safeString(obj["status_code"]),
+			Headers:     convertToMapField(obj["header"]),
+			URL:         safeString(obj["url"]),
+			FinalURL:    safeString(obj["final_url"]),
+			Favicon:     safeString(obj["favicon"]),
+		}
+
+		// Insert or update HTTP record in the database
 		model.UpsertHttp(db, http)
 	}
 }

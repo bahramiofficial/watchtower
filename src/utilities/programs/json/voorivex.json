@@ -1,0 +1,6 @@
+
+{
+    "programName":"voorivex.academy",
+    "scopes":["api.voorivex.academy", "registry.voorivex.academy","dl-api.voorivex.academy","dl.voorivex.academy","mail.voorivex.academy"],
+    "otoscopes":["x.coin.com","y.coin.com","z.coin.com"]
+}

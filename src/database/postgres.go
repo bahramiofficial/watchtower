@@ -3,10 +3,8 @@ package database
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
-	"github.com/bahramiofficial/watchtower/src/utilities"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -26,13 +24,13 @@ type Configdb struct {
 }
 
 func InitDb() error {
-	port, _ := strconv.Atoi(utilities.GetValueEnv("DB_HOST"))
+	// port, _ := strconv.Atoi(utilities.GetValueEnv("DB_HOST"))
 	cfg := &Configdb{
-		Host:            utilities.GetValueEnv("DB_HOST"),
-		Port:            port,
-		User:            utilities.GetValueEnv("DB_USER"),
-		Password:        utilities.GetValueEnv("DB_PASS"),
-		DbName:          utilities.GetValueEnv("DB_NAME"),
+		Host:            "localhost",
+		Port:            5432,
+		User:            "postgres",
+		Password:        "1234",
+		DbName:          "watch",
 		SslMode:         "disable",
 		MaxIdleConns:    15,
 		MaxOpenConns:    100,

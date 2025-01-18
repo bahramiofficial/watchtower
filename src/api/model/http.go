@@ -9,7 +9,6 @@ import (
 // Http represents the HTTP model
 type Http struct {
 	BaseModel
-
 	ProgramName string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"`
 	SubDomain   string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"`
 	Scope       string      `gorm:"type:text;not null"`
@@ -56,13 +55,15 @@ func UpsertHttp(db *gorm.DB, http Http) {
 	var existing Http
 
 	// Check if the record already exists
-	err := db.Where("program_name = ? AND sub_domain = ?", http.ProgramName, http.SubDomain).First(&existing).Error
+	err := db.Where("sub_domain = ?", http.SubDomain).First(&existing).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+
 			// New record, create it
 			if err := db.Create(&http).Error; err != nil {
 				fmt.Printf("Failed to create new Http record: %v", err)
 			} else {
+				//todo send a notification remove print
 				fmt.Printf("New HTTP record created for %s", http.SubDomain)
 
 			}
@@ -72,18 +73,70 @@ func UpsertHttp(db *gorm.DB, http Http) {
 		return
 	}
 
-	// Compare and update fields
+	// Prepare a map to track changes
+	updatedFields := map[string]interface{}{}
+
+	// Compare fields and track updates
 	if http.StatusCode != existing.StatusCode {
-		fmt.Printf("Change status code for  %s", http.SubDomain)
+		updatedFields["status_code"] = http.StatusCode
+		//todo send a notification
 	}
 	if http.Title != existing.Title {
-		fmt.Printf("Change title for  %s", http.SubDomain)
+		updatedFields["title"] = http.Title
+		//todo send a notification
+	}
+	if http.Favicon != existing.Favicon {
+		updatedFields["favicon"] = http.Favicon
+		//todo send a notification
+	}
+	if !compareStringSlices(http.IPs, existing.IPs) {
+		updatedFields["ips"] = http.IPs
+	}
+	if !compareStringSlices(http.Tech, existing.Tech) {
+		updatedFields["tech"] = http.Tech
+	}
+	if http.URL != existing.URL {
+		updatedFields["url"] = http.URL
+	}
+	if http.FinalURL != existing.FinalURL {
+		updatedFields["final_url"] = http.FinalURL
+	}
+	if !compareMapFields(http.Headers, existing.Headers) {
+		updatedFields["headers"] = http.Headers
 	}
 
-	// Perform the update
-	if err := db.Model(&existing).Updates(http).Error; err != nil {
-		fmt.Printf("Failed to update Http record: %v", err)
-		return
+	// Only update if there are changes
+	if len(updatedFields) > 0 {
+		if err := db.Model(&existing).Updates(updatedFields).Error; err != nil {
+			fmt.Printf("Failed to update Http record: %v\n", err)
+		} else {
+			fmt.Printf("HTTP record updated for %s\n", http.SubDomain)
+		}
+	} else {
+		fmt.Printf("No changes for %s, skipping update.\n", http.SubDomain)
 	}
+}
 
+func compareStringSlices(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func compareMapFields(a, b MapField) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, v := range a {
+		if b[k] != v {
+			return false
+		}
+	}
+	return true
 }

@@ -41,7 +41,7 @@ func DynamicBrute(domain string) {
 			if subdomain != "" {
 				model.UpsertSubdomain(db, program.ProgramName, subdomain, "dynamicbrute")
 
-				model.UpsertLiveSubdomain(db, program.ProgramName, subdomain, domain, nil, "")
+				model.UpsertLiveSubdomain(db, domain, subdomain, nil, "")
 				// upsert_lives(domain=domain, subdomain=sub, ips=[], tag="")
 			}
 		}
@@ -133,7 +133,7 @@ func RunDynamicBrute(domain string) (*[]string, error) {
 		defer dnsBruteFile.Close()
 
 		for _, sub := range liveSubdomains {
-			_, err := dnsBruteFile.WriteString(fmt.Sprintf("%s\n", sub.SubDomain))
+			_, err := dnsBruteFile.WriteString(fmt.Sprintf("%s\n", sub.Subdomain))
 			if err != nil {
 
 				fmt.Printf("Failed to write subdomain to file")

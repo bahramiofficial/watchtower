@@ -24,7 +24,7 @@ func InitServer() {
 		programGroup := v1.Group("/program")
 		routers.ProgramRouter(programGroup)
 
-		subdomianGroup := v1.Group("/subdomian")
+		subdomianGroup := v1.Group("/subdomians")
 		routers.SubDomainRouter(subdomianGroup)
 	}
 

@@ -1,24 +1,36 @@
 package model
 
 import (
-	"errors"
 	"fmt"
+	"log"
+	"sort"
 	"strings"
 
 	"github.com/bahramiofficial/watchtower/src/utilities"
 	"gorm.io/gorm"
 )
 
-// todo changed cdn to info and value is cdn or private or none
 // LiveSubdomains represents the live subdomains model
 type LiveSubdomain struct {
 	BaseModel
 	ProgramName string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"` // Composite unique index
-	SubDomain   string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"` // Same unique index name
+	Subdomain   string      `gorm:"type:text;not null;uniqueIndex:idx_program_subdomain"` // Same unique index name
 	Scope       string      `gorm:"type:text;not null"`
-	Cdn         string      `gorm:"type:text;"`
 	IPs         StringArray `gorm:"type:text[]"`
 	Tag         string      `gorm:"type:text"`
+}
+
+// GetLiveSubdomain fetches a LiveSubdomain record by subdomain.
+func GetLiveSubdomain(db *gorm.DB, subdomain string) (*LiveSubdomain, error) {
+	var liveSubdomain LiveSubdomain
+	err := db.Where("subdomain = ?", subdomain).First(&liveSubdomain).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, err // Return nil without an error if no record is found
+		}
+		return nil, fmt.Errorf("failed to fetch live subdomain: %w", err)
+	}
+	return &liveSubdomain, nil
 }
 
 // GetAllLiveSubdomainWithScope fetches all subdomains associated with a given scope
@@ -49,7 +61,7 @@ func GetAllLiveSubdomainWithScopeName(db *gorm.DB, scope string) ([]string, erro
 	// Extract the subdomains from the result
 	var livesubdomainNames []string
 	for _, subdomain := range liveSubdomain {
-		livesubdomainNames = append(livesubdomainNames, subdomain.SubDomain)
+		livesubdomainNames = append(livesubdomainNames, subdomain.Subdomain)
 	}
 
 	// Return the list of subdomains
@@ -71,114 +83,50 @@ func GetAllLiveSubdomainWithScopeAndDomain(db *gorm.DB, scope string, domain str
 	return liveSubdomains, nil
 }
 
-// UpsertLiveSubdomain creates or updates a live subdomain entry in the database
-func UpsertLiveSubdomain(db *gorm.DB, programName string, subDomain string, scope string, ips []string, tag string) error {
+// UpsertLives inserts or updates a live subdomain entry in the database.
+func UpsertLiveSubdomain(db *gorm.DB, domain, subdomain string, ips []string, tag string) error {
+	subdomain = strings.ToLower(subdomain) // Ensure subdomain is in lowercase
 
-	// Check if the subdomain matches the domain and is not a wildcard
-	// Ensure subdomain is valid (no wildcard and no top-level domain)
-	if strings.Contains(subDomain, "*") {
-		return fmt.Errorf("subdomain '%s' contains a wildcard (*), which is not allowed", subDomain)
-	}
-
-	// Check if the subdomain matches the domain and is not a wildcard
-	if strings.Count(subDomain, ".") <= 1 {
-		return fmt.Errorf("subdomain '%s' is invalid. It must contain at least one subdomain (e.g., sub.x.com)", subDomain)
-	}
-
-	// Fetch the program using the program name
-	var program Program
-	if err := db.Where("program_name = ?", programName).First(&program).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("%v program '%s' not found", utilities.GetFormattedTime(), programName)
-		}
-		return fmt.Errorf("failed to fetch program: %w", err)
-	}
-
-	// Extract the base domain from the subdomain
-	baseDomain := utilities.ExtractBaseDomain(subDomain)
-
-	// Check if the base domain is in the program's Scopes or Otoscopes
-	inScope := false
-	for _, scope := range program.Scopes {
-		if baseDomain == scope {
-			inScope = true
-			break
-		}
-	}
-	for _, oto := range program.Otoscopes {
-		if baseDomain == oto {
-			inScope = false
-			break
-		}
-	}
-
-	// Check if the base domain is in the program's Scopes or Otoscopes
-
-	for _, scope := range program.Scopes {
-		if subDomain == scope {
-			inScope = true
-			break
-		}
-	}
-	for _, oto := range program.Otoscopes {
-		if subDomain == oto {
-			inScope = false
-			break
-		}
-	}
-
-	// If the base domain is not in Scopes or Otoscopes, print a warning and return
-	if !inScope {
-		fmt.Printf("%v Subdomain '%s' not in scope for program '%s'\n", utilities.GetFormattedTime(), subDomain, programName)
-		return nil
-	}
-
-	// Initialize a variable to hold the result
-	var liveSubdomain LiveSubdomain
-
-	// Check if the live subdomain exists
-	err := db.Where("program_name = ? AND sub_domain = ?", programName, subDomain).First(&liveSubdomain).Error
-
+	// Get the program associated with the domain
+	program, err := GetProgramByScope(db, domain)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Create a new live subdomain if it doesn't exist
-			newLiveSubdomain := LiveSubdomain{
-				ProgramName: programName,
-				SubDomain:   subDomain,
-				Scope:       scope,
-				Cdn:         "",
-				IPs:         ips,
-				Tag:         tag,
-			}
-			if err := db.Create(&newLiveSubdomain).Error; err != nil {
-				return fmt.Errorf("%v failed to insert live subdomain: %w", utilities.GetFormattedTime(), err)
-			}
-			fmt.Printf("%v insert new live subdomain: %v\n", utilities.GetFormattedTime(), subDomain)
-			return nil
+		return fmt.Errorf("failed to fetch program for domain %s: %w", domain, err)
+	}
+
+	// Fetch an existing live subdomain if it exists
+	existing, _ := GetLiveSubdomain(db, subdomain)
+
+	// If the subdomain exists, update its IPs if needed
+	if existing != nil {
+		print(existing.ProgramName, "thi isssssssss")
+		sort.Strings(existing.IPs) // Sort existing IPs
+		sort.Strings(ips)          // Sort the new IPs
+		if !utilities.AreSlicesEqual(existing.IPs, ips) {
+			existing.IPs = ips
+			log.Printf("[%s] Updated live subdomain: %s", utilities.GetFormattedTime(), subdomain)
 		}
-		return fmt.Errorf("%v failed to fetch live subdomain: %w", utilities.GetFormattedTime(), err)
-	}
 
-	// Update the IPs if they are not already included
-	ipMap := make(map[string]bool)
-	for _, existingIP := range liveSubdomain.IPs {
-		ipMap[existingIP] = true
-	}
-	for _, ip := range ips {
-		if !ipMap[ip] {
-			liveSubdomain.IPs = append(liveSubdomain.IPs, ip)
+		err = db.Save(&existing).Error
+		if err != nil {
+			return fmt.Errorf("failed to update subdomain: %w", err)
 		}
+	} else {
+		print("sskhadkshdlkjahdsthi isssssssss")
+		// Insert a new live subdomain if none exists
+		newLiveSubdomain := &LiveSubdomain{
+			ProgramName: program.ProgramName,
+			Subdomain:   subdomain,
+			Scope:       domain,
+			IPs:         ips,
+			Tag:         tag,
+		}
+		err := db.Save(&newLiveSubdomain).Error
+		if err != nil {
+			return fmt.Errorf("failed to save new subdomain: %w", err)
+		}
+		//todo send a notification  error not lod config file not send messge utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh live) has been added to '%s' program```", subdomain, program.ProgramName))
+		log.Printf("[%s] Inserted new live subdomain: %s", utilities.GetFormattedTime(), subdomain)
 	}
 
-	// Update the tag if provided
-	if tag != "" {
-		liveSubdomain.Tag = tag
-	}
-
-	// Save the updated live subdomain
-	if err := db.Save(&liveSubdomain).Error; err != nil {
-		return fmt.Errorf("%v failed to update live subdomain: %w", utilities.GetFormattedTime(), err)
-	}
-	fmt.Printf("%v updated live subdomain: %v\n", utilities.GetFormattedTime(), subDomain)
 	return nil
 }

@@ -24,3 +24,12 @@ func (s *ProgramService) GetAllPrograms() ([]model.Program, error) {
 	}
 	return programs, nil
 }
+
+// GetAll retrieves all programs from the database
+func (s *ProgramService) GetSinglePrograms(programname string) (model.Program, error) {
+	program, err := model.GetProgramByProgramName(s.database, programname)
+	if err != nil {
+		return model.Program{}, err
+	}
+	return program, nil
+}

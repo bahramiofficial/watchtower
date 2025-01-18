@@ -6,16 +6,17 @@ import (
 	"github.com/bahramiofficial/watchtower/src/api"
 	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/database/migrations"
-	watchsyncprograms "github.com/bahramiofficial/watchtower/src/utilities/programs"
+	watchhttp "github.com/bahramiofficial/watchtower/src/utilities/http"
+	// watchsyncprograms "github.com/bahramiofficial/watchtower/src/utilities/programs"
 )
 
 // "github.com/bahramiofficial/watchtower/src/database"
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
-	// ns.Ns()
-	watchsyncprograms.SyncProgramToDb("")
-	RunServer()
+	watchhttp.Httpx("voorivex.academy")
+	// watchsyncprograms.SyncProgramToDb("")
+	// RunServer()
 }
 
 func RunServer() {

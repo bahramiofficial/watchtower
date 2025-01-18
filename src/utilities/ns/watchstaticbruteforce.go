@@ -41,7 +41,7 @@ func StaticBrute(domain string) {
 		for _, subdomain := range *results {
 			if subdomain != "" {
 				model.UpsertSubdomain(db, program.ProgramName, subdomain, "staticbrute")
-				model.UpsertLiveSubdomain(db, program.ProgramName, subdomain, domain, nil, "")
+				model.UpsertLiveSubdomain(db, domain, subdomain, nil, "")
 				// upsert_lives(domain=domain, subdomain=sub, ips=[], tag="")
 			}
 		}
