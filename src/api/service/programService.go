@@ -26,10 +26,18 @@ func (s *ProgramService) GetAllPrograms() ([]model.Program, error) {
 }
 
 // GetAll retrieves all programs from the database
-func (s *ProgramService) GetSinglePrograms(programname string) (model.Program, error) {
+func (s *ProgramService) GetSingleProgram(programname string) (model.Program, error) {
 	program, err := model.GetProgramByProgramName(s.database, programname)
 	if err != nil {
 		return model.Program{}, err
 	}
 	return program, nil
+}
+
+func (s *ProgramService) DeleteProgram(programname string) error {
+	err := model.DeleteProgramWithProgramName(s.database, programname)
+	if err != nil {
+		return err
+	}
+	return nil
 }

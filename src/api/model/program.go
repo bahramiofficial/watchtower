@@ -157,3 +157,16 @@ func GetProgramByScope(db *gorm.DB, domain string) (*Program, error) {
 	}
 	return &program, nil
 }
+
+// DeleteProgramWithProgramName deletes a Program by its ProgramName.
+func DeleteProgramWithProgramName(db *gorm.DB, programName string) error {
+	// Attempt to delete the program with the specified program name
+	result := db.Where("program_name = ?", programName).Delete(&Program{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete program with name '%s': %w", programName, result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no program found with name '%s'", programName)
+	}
+	return nil
+}

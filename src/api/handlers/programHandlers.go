@@ -49,7 +49,7 @@ func (h *ProgramHandler) GetAllProgramsHandler(c *gin.Context) {
 	}
 }
 
-func (h *ProgramHandler) GetSingleProgramsHandler(c *gin.Context) {
+func (h *ProgramHandler) GetSingleProgramHandler(c *gin.Context) {
 	jsonOutput := c.Query("json")
 	programName := c.Param("programname")
 	if programName == "" {
@@ -61,7 +61,7 @@ func (h *ProgramHandler) GetSingleProgramsHandler(c *gin.Context) {
 			c.String(http.StatusBadRequest, "programname is required")
 		}
 	}
-	program, err := h.ProgramService.GetSinglePrograms(programName)
+	program, err := h.ProgramService.GetSingleProgram(programName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve programs"})
 		return
@@ -73,5 +73,32 @@ func (h *ProgramHandler) GetSingleProgramsHandler(c *gin.Context) {
 	} else {
 		// Return plain text with newlines
 		c.String(http.StatusOK, "%s", program)
+	}
+}
+
+func (h *ProgramHandler) DeleteProgramHandler(c *gin.Context) {
+	jsonOutput := c.Query("json")
+	programName := c.Param("programname")
+	if programName == "" {
+		if jsonOutput == "true" {
+			// Return JSON format
+			c.JSON(http.StatusBadRequest, gin.H{"error": "programname is required"})
+		} else {
+			// Return plain text with newlines
+			c.String(http.StatusBadRequest, "programname is required")
+		}
+	}
+	err := h.ProgramService.DeleteProgram(programName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Delete programs"})
+		return
+	}
+
+	if jsonOutput == "true" {
+		// Return JSON format
+		c.JSON(http.StatusOK, gin.H{"programs": "Delete programs"})
+	} else {
+		// Return plain text with newlines
+		c.String(http.StatusOK, "Delete programs")
 	}
 }

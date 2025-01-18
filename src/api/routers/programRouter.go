@@ -9,6 +9,7 @@ func ProgramRouter(r *gin.RouterGroup) {
 	programHandler := handlers.NewProgramHandler()
 
 	r.GET("/all", programHandler.GetAllProgramsHandler)
-	r.GET("/:programname", programHandler.GetSingleProgramsHandler)
+	r.GET("/:programname", programHandler.GetSingleProgramHandler)
+	r.GET("/:programname/delete", programHandler.DeleteProgramHandler)
 
 }
