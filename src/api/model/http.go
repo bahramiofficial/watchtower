@@ -64,6 +64,7 @@ func UpsertHttp(db *gorm.DB, http Http) {
 			if err := db.Create(&http).Error; err != nil {
 				fmt.Printf("Failed to create new Http record: %v", err)
 			} else {
+				//todo if start  no send for error discord to many request
 				utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh http) has been added to '%s' program```", http.SubDomain, http.ProgramName))
 
 				fmt.Printf("New HTTP record created for %s", http.SubDomain)

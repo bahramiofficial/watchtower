@@ -43,7 +43,7 @@ func NucleiAll() {
 
 		// Send results if not empty
 		if results != "" {
-			//todo
+			//todo 
 			utilities.SendDiscordMessage(results)
 		}
 	}
