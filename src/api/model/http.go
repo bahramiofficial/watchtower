@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 
+	"github.com/bahramiofficial/watchtower/src/utilities"
 	"gorm.io/gorm"
 )
 
@@ -63,7 +64,8 @@ func UpsertHttp(db *gorm.DB, http Http) {
 			if err := db.Create(&http).Error; err != nil {
 				fmt.Printf("Failed to create new Http record: %v", err)
 			} else {
-				//todo send a notification remove print
+				utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh http) has been added to '%s' program```", http.SubDomain, http.ProgramName))
+
 				fmt.Printf("New HTTP record created for %s", http.SubDomain)
 
 			}
@@ -79,15 +81,18 @@ func UpsertHttp(db *gorm.DB, http Http) {
 	// Compare fields and track updates
 	if http.StatusCode != existing.StatusCode {
 		updatedFields["status_code"] = http.StatusCode
-		//todo send a notification
+		utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh http) has been updated status code to : '%s'```", http.SubDomain, http.StatusCode))
+
 	}
 	if http.Title != existing.Title {
 		updatedFields["title"] = http.Title
-		//todo send a notification
+		utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh http) has been updated title to : '%s'```", http.SubDomain, http.Title))
+
 	}
 	if http.Favicon != existing.Favicon {
 		updatedFields["favicon"] = http.Favicon
-		//todo send a notification
+		utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh http) has been updated favicon to : '%s'```", http.SubDomain, http.Favicon))
+
 	}
 	if !compareStringSlices(http.IPs, existing.IPs) {
 		updatedFields["ips"] = http.IPs

@@ -124,8 +124,8 @@ func UpsertLiveSubdomain(db *gorm.DB, domain, subdomain string, ips []string, ta
 		if err != nil {
 			return fmt.Errorf("failed to save new subdomain: %w", err)
 		}
-		//todo send a notification  error not lod config file not send messge utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh live) has been added to '%s' program```", subdomain, program.ProgramName))
-		log.Printf("[%s] Inserted new live subdomain: %s", utilities.GetFormattedTime(), subdomain)
+		utilities.SendDiscordMessage(fmt.Sprintf("```'%s' (fresh live) has been added to '%s' program```", subdomain, program.ProgramName))
+
 	}
 
 	return nil

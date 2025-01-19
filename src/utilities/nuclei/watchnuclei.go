@@ -42,6 +42,7 @@ func Nuclei(domain string) {
 
 		// Send results if not empty
 		if results != "" {
+			//todo
 			utilities.SendDiscordMessage(results)
 		}
 	}
