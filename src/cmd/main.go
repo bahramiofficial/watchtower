@@ -6,7 +6,6 @@ import (
 	"github.com/bahramiofficial/watchtower/src/api"
 	"github.com/bahramiofficial/watchtower/src/database"
 	"github.com/bahramiofficial/watchtower/src/database/migrations"
-	watchhttp "github.com/bahramiofficial/watchtower/src/utilities/http"
 	// watchsyncprograms "github.com/bahramiofficial/watchtower/src/utilities/programs"
 )
 
@@ -14,9 +13,9 @@ import (
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
-	watchhttp.Httpx("voorivex.academy")
+	// watchhttp.Httpx("voorivex.academy")
 	// watchsyncprograms.SyncProgramToDb("")
-	// RunServer()
+	RunServer()
 }
 
 func RunServer() {
