@@ -3,122 +3,62 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/bahramiofficial/watchtower/src/api/model"
 	"github.com/bahramiofficial/watchtower/src/api/service"
 	"github.com/gin-gonic/gin"
 )
 
 type LiveSubdomainHandler struct {
 	LiveSubdomainService *service.LiveSubdomainService
-	SubdomainService     *service.SubdomainService
 }
 
 func NewLiveSubdomainHandler() *LiveSubdomainHandler {
-	return &LiveSubdomainHandler{LiveSubdomainService: service.NewLiveSubdomainService(), SubdomainService: service.NewSubdomainService()}
+	return &LiveSubdomainHandler{LiveSubdomainService: service.NewLiveSubdomainService()}
 }
 
-type CombinedSubdomain struct {
-	model.LiveSubdomain
-	Providers model.StringArray `json:"providers"`
-}
-
-// GetLiveSubdomainsByScopeHandler handles requests to retrieve live subdomains by scope
-func (h *LiveSubdomainHandler) GetSingleLiveSubdomainHandler(c *gin.Context) {
-	subdomainInput := c.Param("subdomianlive")
-	if subdomainInput == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Domain is required"})
-		return
+// LiveSubdomainsHandler handles the /api/livesubdomains endpoint
+func (h *LiveSubdomainHandler) LiveSubdomainsHandler(c *gin.Context) {
+	filter := service.LiveSubdomainFilter{
+		ProgramName: c.Query("program"),
+		Scope:       c.Query("scope"),
+		Provider:    c.Query("provider"),
+		Fresh:       c.DefaultQuery("fresh", "false") == "true",
+		Count:       c.DefaultQuery("count", "false") == "true",
+		Limit:       parseQueryInt(c, "limit", 1000),
+		Page:        parseQueryInt(c, "page", 1),
 	}
+	jsonOutput := c.DefaultQuery("json", "false") == "true"
 
-	liveSubdomain, err := h.LiveSubdomainService.GetSingleLiveSubdomainBySubdomain(subdomainInput)
+	livesubdomains, count, err := h.LiveSubdomainService.GetLiveSubdomains(filter)
 	if err != nil {
-		// Handle error
-	}
-
-	subdomain, err := h.SubdomainService.GetSingleSubdomainBySubDomain(subdomainInput)
-	if err != nil {
-		// Handle error
-	}
-
-	// Assign Providers from Subdomain to LiveSubdomain
-	combined := CombinedSubdomain{
-		LiveSubdomain: liveSubdomain,
-		Providers:     subdomain.Providers,
-	}
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve live subdomains"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve subdomains", "details": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"liveSubdomains": combined})
-}
-
-// todo edit code and ad service for get live domomain with provider
-// GetLiveSubdomainsByScopeHandler handles requests to retrieve live subdomains by scope
-func (h *LiveSubdomainHandler) GetLiveSubdomainWithProviderHandler(c *gin.Context) {
-	provider := c.Param("provider")
-
-	if provider == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Domain is required"})
-		return
-	}
-	//todo edit code and ad service for get live domomain with provider
-	// time =  time.Now(). - timedelta(hurse=12).
-	// get all sub domain with provider  from subdmoain  and for on all
-	// print sub domain
-	// get livesubdomain  where subdomain = subsodmina and updatedat  bozrgtar az time
-	// if live have value  string res  subdomain+\n
-	//return res
-
-	c.JSON(http.StatusOK, gin.H{"liveSubdomains": "liveSubdomains"})
-}
-
-// GetLiveSubdomainsByScopeHandler handles requests to retrieve live subdomains by scope
-func (h *LiveSubdomainHandler) GetLiveSubdomainsByScopeHandler(c *gin.Context) {
-	scope := c.Param("domain")
-	if scope == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Domain is required"})
+	if filter.Count {
+		c.JSON(http.StatusOK, gin.H{"count": count})
 		return
 	}
 
-	liveSubdomains, err := h.LiveSubdomainService.GetLiveSubdomainsByScope(scope)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve live subdomains"})
+	if len(livesubdomains) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No subdomains found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"liveSubdomains": liveSubdomains})
-}
-
-// GetLiveSubdomainsByProgramNameHandler handles requests to retrieve live subdomains by program name
-func (h *LiveSubdomainHandler) GetLiveSubdomainsByProgramNameHandler(c *gin.Context) {
-	programName := c.Param("programname")
-	jsonOutput := c.Query("json")
-
-	if programName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "programname is required"})
-		return
-	}
-
-	liveSubdomains, err := h.LiveSubdomainService.GetLiveSubdomainsByProgramName(programName)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve live subdomains", "details": err.Error()})
-		return
-	}
-
-	if jsonOutput == "true" {
-		c.JSON(http.StatusOK, gin.H{"liveSubdomains": liveSubdomains})
+	if jsonOutput {
+		c.JSON(http.StatusOK, livesubdomains)
 	} else {
-		c.String(http.StatusOK, "%s", formatStringToAddBackSlashN(extractLiveSubdomainNames(liveSubdomains)))
+		c.String(http.StatusOK, formatLiveSubdomainList(livesubdomains))
 	}
 }
 
-// Helper function to extract LiveSubdomain names
-func extractLiveSubdomainNames(liveSubdomains []model.LiveSubdomain) []string {
-	names := make([]string, len(liveSubdomains))
-	for i, liveSubdomain := range liveSubdomains {
-		names[i] = liveSubdomain.Subdomain
+// GetLiveSubdomainDetailHandler handles the /api/livesubdomains/details/:subdomain endpoint
+func (h *LiveSubdomainHandler) GetLiveSubdomainDetailHandler(c *gin.Context) {
+	subdomain := c.Param("subdomain")
+	subdomainObj, err := h.LiveSubdomainService.GetSingleLiveSubdomainBySubDomain(subdomain)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Not found", "subdomain": subdomain})
+		return
 	}
-	return names
+
+	c.JSON(http.StatusOK, subdomainObj)
 }

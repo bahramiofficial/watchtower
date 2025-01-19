@@ -8,7 +8,7 @@ import (
 func LiveSubDomainRouter(r *gin.RouterGroup) {
 	livesubdomainHandler := handlers.NewLiveSubdomainHandler()
 
-	r.GET("/subdomian/:subdomianlive", livesubdomainHandler.GetSingleLiveSubdomainHandler)
-	r.GET("/provider/:provider", livesubdomainHandler.GetLiveSubdomainWithProviderHandler)
+	r.GET("/", livesubdomainHandler.LiveSubdomainsHandler)
+	r.GET("/details/:subdomain ", livesubdomainHandler.GetLiveSubdomainDetailHandler)
 
 }

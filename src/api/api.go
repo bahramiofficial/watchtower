@@ -26,6 +26,13 @@ func InitServer() {
 
 		subdomianGroup := v1.Group("/subdomians")
 		routers.SubDomainRouter(subdomianGroup)
+
+		livesubdomianGroup := v1.Group("/livesubdomians")
+		routers.LiveSubDomainRouter(livesubdomianGroup)
+
+		httpGroup := v1.Group("/http")
+		routers.HttpRouter(httpGroup)
+
 	}
 
 	r.Run(":8000")

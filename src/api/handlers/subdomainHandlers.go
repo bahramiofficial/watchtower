@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/bahramiofficial/watchtower/src/api/model"
 	"github.com/bahramiofficial/watchtower/src/api/service"
 	"github.com/gin-gonic/gin"
 )
@@ -63,23 +61,4 @@ func (h *SubdomainHandler) GetSubdomainDetailHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, subdomainObj)
-}
-
-// Helper function to parse query parameters as integers with a default value
-func parseQueryInt(c *gin.Context, key string, defaultValue int) int {
-	if val, ok := c.GetQuery(key); ok {
-		if intValue, err := strconv.Atoi(val); err == nil {
-			return intValue
-		}
-	}
-	return defaultValue
-}
-
-// Helper function to format subdomain list as a plain text response
-func formatSubdomainList(subdomains []model.Subdomain) string {
-	result := ""
-	for _, sub := range subdomains {
-		result += sub.SubDomain + "\n"
-	}
-	return result
 }
