@@ -35,7 +35,7 @@ pgdata/
 dump.sql
 
 # Environment variables and configuration files
-.env
+config.env
 
 
 # Logs and temporary files
