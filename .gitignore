@@ -1,0 +1,59 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of build tools
+*.log
+*.out
+
+# Dependency directories (you should commit go.sum but not vendor/)
+vendor/
+go.sum
+
+# Ignore Go test binary
+*.test
+
+# Ignore compiled object files
+*.o
+*.a
+
+# VSCode specific files
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+
+# PostgreSQL specific files
+*.pgsql
+*.pgpass
+pgdata/
+dump.sql
+
+# Environment variables and configuration files
+.env
+
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Database backups
+*.bak
+*.sql
+*.sql.gz
+
+# Ignore the data/subfinder/ directory
+data/subfinder/
+data/chaos/
+data/nuclei/private_templates
+data/subfinder/
+
+# Ignore all JSON files in utilities/programs/json/
+utilities/programs/json/*.json
+
+# Exception: Allow voorivex.json to be tracked
+!utilities/programs/json/voorivex.json

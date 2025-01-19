@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -93,8 +94,13 @@ func GetUserAgent() string {
 
 // env
 func GetValueEnv(key string) string {
-	return "https:google.com"
-	err := godotenv.Load()
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return ""
+	}
+
+	err = godotenv.Load(filepath.Join(currentDir, "config.env"))
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}

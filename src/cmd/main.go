@@ -13,8 +13,6 @@ import (
 // "github.com/bahramiofficial/watchtower/src/database/migrations"
 
 func main() {
-	// watchhttp.Httpx("voorivex.academy")
-	// watchsyncprograms.SyncProgramToDb("")
 	RunServer()
 }
 
