@@ -10,7 +10,7 @@
 
 # Dependency directories (you should commit go.sum but not vendor/)
 vendor/
-go.sum
+go.sum 
 
 # Ignore Go test binary
 *.test
@@ -18,12 +18,15 @@ go.sum
 # Ignore compiled object files
 *.o
 *.a
+ 
+documents
+coverage.txt
+_book
+.idea
+vendor
+.vscode
 
-# VSCode specific files
-.vscode/
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
+ 
 
 # PostgreSQL specific files
 *.pgsql
@@ -55,5 +58,3 @@ data/subfinder/
 # Ignore all JSON files in utilities/programs/json/
 utilities/programs/json/*.json
 
-# Exception: Allow voorivex.json to be tracked
-!utilities/programs/json/voorivex.json

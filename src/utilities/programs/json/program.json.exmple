@@ -1,0 +1,6 @@
+
+{
+    "programName":"example.com",
+    "scopes":["api.example.com", "registry.example.com", "login.example.com"],
+    "otoscopes":["panel.example.com","x.example.com"]
+}
